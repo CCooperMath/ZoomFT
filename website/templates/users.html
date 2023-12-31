@@ -1,0 +1,27 @@
+
+    {% extends "base.html" %}
+    {% block pageContent%}
+    <body>
+    <table>
+        <tr>
+            <td> User </td>
+            <td> Admin? </td>
+            <td> Friend? </td>
+        </tr>
+    {% for user in users %}
+    <tr>
+        <td> {{user[3]}} </td>
+        <td> {{user[1] == 1}} </td>
+        {% if user[3] in friendList %}
+        <td> <button>Remove Friend </button> </td>
+        {% else %}
+        <td> <button>Add Friend </button> </td>
+        {% endif %}
+        {% if session['administrator'] %}
+        <td> <button>Ban</button> </td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+    <table>
+    </body>
+    {% endblock %}
