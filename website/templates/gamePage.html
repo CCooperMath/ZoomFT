@@ -1,9 +1,29 @@
 {% extends "base.html" %}
 {% block pageContent%}
 <body>
-<h1>{{game_title}}</h1>
-<button>Purchase game for ${{game_price}}</button>
+<h1>{{game[1]}}</h1>
+
+{% if session['username'] %}
+<button>Purchase game for ${{game[2]}}</button>
+{% endif %}
+
+<h1> Interested in similar games? </h1>
+<p> The games below share a tag with {{game[1]}}. You may like them! </p>
+<table>
+{% for related in relatedGames %}
+<tr>
+    <td>
+        <a href="/games/{{related[2]}}">{{related[4]}}</a>
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+<hr>
+<h1> User Reviews for {{game[1]}} </h1>
+
+
+
 
 </body>
-{% endif %}
 {% endblock %}

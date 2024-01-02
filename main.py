@@ -1,7 +1,4 @@
 #! /usr/bin/env python
-
-
-
 from website import initialize
 
 app = initialize()

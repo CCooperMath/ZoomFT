@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block pageContent%}
+<body>
+    <h1> {{userInfo[1]}} </h1>
+    {% if session['userID'] == userInfo[0]%}
+    <form>
+        <label for="fundsAmount"> Add funds to your account </label><br>
+        <input type ="text" id="fundsAmount" name="fundsAmount"</br>
+
+        <input type ="submit" value="Add Funds">
+    </form>
+
+    {% endif %}
+<hr>
+<h1>User Library</h1>
+<div>
+    <table>
+        <tr>
+            <td> Title </td>
+        </tr>
+        {% for game in library %}
+        <tr><td><a href='/games/{{game[1]}}'>{{game[4]}}</a></td></tr>
+        {% endfor %}
+    </table>
+</div>
+
+<hr>
+<h1>Friend List</h1>
+<div>
+    <table> 
+        <tr> 
+            <td> Username </td>
+        </tr>
+    {% for friend in friends %}
+    <tr><td> <a href='{{friend[2]}}'>{{friend[4]}}</a> </tr></td>
+    {% endfor %}
+    </table>
+
+</div>
+
+</body>
+{% endblock %}

@@ -2,7 +2,7 @@
 
 
 from flask import Blueprint, render_template
-from . import db, lm, um, tm, gm
+from . import interfacer, loginManager, userManager, tagManager, gameManager
 
 views = Blueprint('views',__name__)
 
@@ -14,13 +14,33 @@ def home():
 
 @views.route('/users')
 def user():
-    userList = um.getAllUsers()
+    userList = userManager.getAllUsers()
     print(userList)
     return render_template("users.html", users = userList)
 
-@views.route('/store')
-def store():
-    gameList = gm.getAllUsers()
-    return render_template("store.html", games = gameList)
+@views.route('/games')
+def games():
+    gameList = gameManager.getAllGames()
+    return render_template("games.html", games = gameList)
+
+@views.route('/users/<int:userID>')
+def profile(userID):
+    # Fetch userInfo 
+    userInfo = interfacer.getFromID('Users',userID)
+
+    username = userInfo[1]
+    userLibrary = userManager.getLibrary(username)
+    userFriends = userManager.getFriendsOf(username)
+    print(userLibrary)
+    print(userFriends)
+    return render_template("profile.html", userInfo = userInfo, library = userLibrary, 
+                           friends = userFriends)
+
+@views.route('/games/<int:gameID>')
+def gamePage(gameID):
+    gameInfo = interfacer.getFromID('Games',gameID)
+    sharedTag = gameManager.getGamesWithSharedTag(gameInfo[1])
+    print(sharedTag)
+    return render_template("gamePage.html", game = gameInfo, relatedGames = sharedTag)
 
 

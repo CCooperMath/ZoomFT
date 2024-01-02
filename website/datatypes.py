@@ -1,8 +1,12 @@
+from . import constants  as const
+
 class User:
     """
     A class representing all necessary user data.
 
     attributes:
+    userID: int 
+        A integer representing a users ID. 
     username: string
         A string representing a users username. 
     password: string 
@@ -13,13 +17,14 @@ class User:
         A boolean value representing whether the user is an administrator
         or not. 
     """
-    def __init__(self,username,password,balance = 0.0 ,administrator = 0):
+    def __init__(self,userID,username,password,balance = 0.0 ,administrator = 0):
         """ Initializes the User object. The initializer does NOT perform
         any input sanitation. The initializer DOES provide default values
         for balance and administrator. 
 
         Parameters
         ----------
+        userID: Int
         username: String
         password: String
         balance: Decimal
@@ -29,6 +34,7 @@ class User:
         -------
         User object 
         """
+        self.userID = userID
         self.username = username
         self.password = password
         self.balance = balance
@@ -40,24 +46,27 @@ class User:
         ease of compatibility with SQL queries. Note that the id
         in the SQL database is NOT included here. 
         """
-        return (self.username,self.password,self.balance,self.administrator)
+        return (self.userID,self.username,self.password,self.balance,self.administrator)
 
 class Game:
     """
     A class representing all necessary user data.
 
     attributes:
+    gameID: int
+        An integer representing the games ID. 
     title: string
         A string representing the title of the game.
     price: decimal
         A decimal representing the price of the game. 
     """
-    def __init__(self, title, price):
+    def __init__(self, gameID, title, price):
         """ Initializes the Game object. The initializer does NOT
         perform any input sanitation. 
 
         Parameters
         ----------
+        gameID: int 
         title: String
         price: Decimal
         
@@ -65,6 +74,7 @@ class Game:
         -------
         Game object 
         """
+        self.gameID = gameID
         self.title = title
         self.price = price
     
@@ -74,13 +84,15 @@ class Game:
         ease of compatibility with SQL queries. Note that 
         the id in the SQL database is NOT included here.
         """
-        return (self.title,self.price)
+        return (self.gameID, self.title,self.price)
 
 class Review:
     """
     A class representing all necessary user data.
 
     attributes:
+    reviewID: int
+        An integer representing the reviews ID. 
     gameTitle: string
         A string representing the title of the game the 
         review is for. 
@@ -91,7 +103,7 @@ class Review:
         A string representing the body of the review. 
 
     """
-    def __init__(self,gameTitle,authorName,body, rating):
+    def __init__(self,reviewID, gameTitle,authorName,body, rating):
         """ Initializes the Review object. The initializer
         does NOT perform any input sanitation. 
 
@@ -113,6 +125,7 @@ class Review:
         -------
         Review object 
         """
+        self.reviewID = reviewID
         self.game = game
         self.author = author
         self.body = body
@@ -124,17 +137,18 @@ class Review:
         ease of compatibility with SQL queries. Note that 
         the id in the SQL database is not included here.
         """
-        return (self.game,self.author,self.body)
+        return (self.reviewID, self.game,self.author,self.body)
 
 class Tag:
     """
     A class representing all necessary tag data.
 
     attributes:
+    tagID: int
     name: string
         A string representing a tags name.
     """
-    def __init__(self, name):
+    def __init__(self, tagID, name):
         """ Initializes the Tag object. The initializer does NOT
         perform any input sanitation. 
 
@@ -147,6 +161,7 @@ class Tag:
         -------
         Tag object 
         """
+        self.tagID = tagID
         self.name = name
 
     def astuple(self):
@@ -155,5 +170,5 @@ class Tag:
         ease of compatibility with SQL queries. Note that 
         the id in the SQL database is NOT included here.
         """
-        return (self.name)
+        return (self.tagID, self.name)
 

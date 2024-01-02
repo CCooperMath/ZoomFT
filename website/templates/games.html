@@ -1,0 +1,18 @@
+
+{% extends "base.html" %}
+{% block pageContent%}
+<body>
+<table>
+    <tr>
+        <td> Title </td>
+        <td> Price </td>
+    </tr>
+{% for game in games %}
+<tr>
+    <td><a href = 'games/{{game[0]}}'> {{game[1]}} </a></td>
+    <td> {{game[2]}} </td>
+</tr>
+{% endfor %}
+<table>
+</body>
+{% endblock %}

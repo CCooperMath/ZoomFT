@@ -15,11 +15,11 @@ config = {
 }
 
 # Create the Flask application and set its secret key.
-db = Interfacer(config)
-lm = LoginManager(db)
-tm = TagManager(db)
-um = UserManager(db)
-gm = GameManager(db)
+interfacer = Interfacer(config)
+loginManager = LoginManager(interfacer)
+tagManager = TagManager(interfacer)
+userManager = UserManager(interfacer)
+gameManager = GameManager(interfacer)
 
 # Database initialization 
 

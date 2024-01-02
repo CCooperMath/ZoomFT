@@ -10,7 +10,8 @@
     <ul>
         {% if session['username'] %}
         <li><a href="/auth/logout">Log out</a></li>
-        <li><a href="/library">My Library</a></li>
+        <li><a href="/users/{{session['userID']}}">My Profile</a></li>
+        
         <li><a href="/auth/settings">Account Settings</a></li>
         {% else %}
         <li><a href="/auth/login">Log in</a></li>
@@ -18,9 +19,6 @@
         {% endif %}
         <li><a href="/games">View Games</a></li>
         <li><a href="/users">View Users</a></li>
-        {% if session['administrator'] %}
-        <li><a href="/admin">Administrative Tools</a></li>
-        {% endif %}
     </ul>
 
     <hr>

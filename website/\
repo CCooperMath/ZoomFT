@@ -39,7 +39,7 @@ class LoginManager:
 
         """
         result = self.interfacer.getFromReference('Users','Username',username)
-        return (result != []) 
+        return (result != None) 
 
     def checkPassword(self, username, password):
         """ Checks if a given password matches with a given username in the database 
@@ -84,11 +84,9 @@ class LoginManager:
         if(not self.checkExists(username)):
             print("User does not exist.")
             self.interfacer.execute('INSERT INTO Users VALUES (DEFAULT, %s, %s, %s, %s)', (username, password, balance, administrator))
-            print("User created.")
-            self.interfacer.commit()
             return True
-        print("User already exists.")
         return False
+            print("User already exists.")
 
             
 
@@ -132,11 +130,8 @@ class LoginManager:
 
         """
         if( self.checkPassword(username,password) ):
-            user = self.interfacer.getFromReference('Users','Username',username)
-
             session['username'] = username
-            session['administrator'] = user[0][const.SQL_ADMINISTRATOR]
-            session['userID'] = user[0][const.SQL_ID]
+            session['administrator'] = self.getUser(username).administrator 
             return True
         else:
             return False 
@@ -148,7 +143,6 @@ class LoginManager:
 
         session['username'] = None
         session['administrator'] = False
-        session['userID'] = None
 
 
 class UserManager:
@@ -189,7 +183,6 @@ class UserManager:
         """
 
         success = self.interfacer.editEntry('Users','Username','Username',startName,endName)
-        self.interfacer.commit()
         return success
 
     def changePassword(self, username, newPassword):
@@ -207,7 +200,7 @@ class UserManager:
         True if the password was successfully changed. False if otherwise. 
         """
         success = self.interfacer.editEntry('Users','Username','Password',username,newPassword)
-        self.interfacer.commit() 
+        
         return success 
 
     def getUser(self,username):
@@ -238,7 +231,7 @@ class UserManager:
         An iterator over all tuples representing the users in the database. 
         """
         self.interfacer.execute("SELECT * FROM Users", None)
-        return self.interfacer.fetchall() 
+        return 
     
 
     def addFriend(self, user1, user2):
@@ -264,7 +257,6 @@ class UserManager:
         # Add friendship both ways. 
         success = self.interfacer.addRelation('Friends','UserID', 'FriendID', userID1, userID2)
         success = success and self.interfacer.addRelation('Friends', 'FriendID', 'UserID', userID1, userID2)
-        self.interfacer.commit()
         return success 
 
     def getFriendsOf(self, username):
@@ -283,7 +275,7 @@ class UserManager:
         # Returns a list of names that are friends with the user. 
        
         userID = self.interfacer.getID('Users','Username',username)
-        friends = self.interfacer.getRelated('Friends','Users','UserID','FriendID',userID)
+        friends = self.interfacer.getRelated('Friends','UserID',userID)
         return friends
 
 
@@ -303,7 +295,7 @@ class UserManager:
 
         """
         userID = self.interfacer.getID('Users','Username',username)
-        gameLibrary = self.interfacer.getRelated('UserLibraries','Games','UserID','GameID',userID)
+        gameLibrary = self.interfacer.getRelated('UserLibraries','UserID',userID)
         return gameLibrary
 
     def addToLibrary(self, username, title):
@@ -320,8 +312,7 @@ class UserManager:
         userID = self.interfacer.getID('Users','Username',username)
         gameID = self.interfacer.getID('Games','Title',title)
         if (userID != None and gameID != None):
-            success = self.interfacer.addRelation('UserLibraries','UserID','GameID',userID,gameID)
-            self.interfacer.commit()
+            success = self.interfacer.addRelation('UserLibraries','UserID','GameID',username,title)
         return success
 
     def deleteFriendships(self, username):
@@ -331,7 +322,6 @@ class UserManager:
         # Remove entries twice because friendship is symmetric. 
         success = self.interfacer.removeRelated('Friends','UserID',userID)
         success = success and self.interfacer.removeRelated('Friends', 'FriendID', userID)
-        self.interfacer.commit()
         return success
         
 
@@ -350,7 +340,6 @@ class UserManager:
 
         userID = self.interfacer.getID('Users','Username',username)
         success = self.interfacer.removeReleated('UserLibraries', 'UserID', userID)
-        self.interfacer.commit()
         return success
 
     def deleteReviews(self, username):
@@ -368,7 +357,6 @@ class UserManager:
         
         userID = self.interfacer.getID('Users','Username',username)
         success = self.interfacer.removeRelated('Reviews','AuthorID',userID)
-        self.interfacer.commit()
         return success
 
 
@@ -398,7 +386,6 @@ class UserManager:
         # If all previous attempts succeeded, delete the user account. 
         try:
             self.interfacer.execute('DELETE FROM Users WHERE Username = %s', (username, ))
-            self.interfacer.commit()
             return True
         except Exception as e:
             print(e)
@@ -446,7 +433,6 @@ class GameManager:
         """
         try:
             self.interfacer.execute('INSERT INTO Games VALUES (DEFAULT, %s, %s)', (title, price))
-            self.interfacer.commit()
             return True
         except Exception as e:
             print(e)
@@ -483,20 +469,19 @@ class GameManager:
         """
         try:
             gameID = self.interfacer.getID('Games','Title',title)
-            gameTags = self.interfacer.getRelated('TagRelations', 'Tags', 'GameID', 'TagID', gameID)
+            gameTags = self.interfacer.getRelated('TagRelations', 'GameID', 'TagID', gameID)
             
             # Use a set here to ignore duplicate games. Obviously will share a tag with itself. 
-            gamesWithSharedTag = set()
+            gamesWithSharedTag = {title}
+
             if gameTags != None:
                 # The game has tags. 
                 for tags in gameTags:
-                    print(tags)
                     # Fetch all games with this tag.
-                    games = self.interfacer.getRelated('TagRelations', 'Games', 'TagID', 'GameID', tags[1])
+                    games = self.interfacer.getRelated('TagRelations', 'TagID', 'GameID', tagID)
                     # the games variable is 100% not None, because it at least has 
                     # our input game in its list. 
                     for game in games:
-                        print(game)
                         gamesWithSharedTag.add(game)
                 return gamesWithSharedTag 
             else: 
@@ -548,7 +533,6 @@ class GameManager:
             gameID = self.interfacer.getID('Games','Title', title)
             tagID = self.interfacer.getID('Tags','TagName', tag)
             self.interfacer.addRelation('TagRelations','TagID','GameID', tagID, gameID)
-            self.interfacer.commit()
             return True
         except Exception as e:
             print(e)
@@ -604,9 +588,7 @@ class GameManager:
         -------
         True upon a successful deletion. False if otherwise. 
 
-        """
-
-        self.interfacer.commit()
+        """ 
 
 class TagManager:
     """ A manager designed for handling 
@@ -646,7 +628,6 @@ class TagManager:
 
         try: 
             self.interfacer.execute('INSERT INTO Tags VALUES (DEFAULT, %s)', (tagName, ))
-            self.interfacer.commit()
             return True
         except Exception as e:
             print(e)
@@ -745,7 +726,7 @@ class TagManager:
         -------
         True if the tag was successfully deleted from the database. False if otherwise. 
         """
-        self.interfacer.commit()
+
 
 
 
