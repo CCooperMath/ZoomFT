@@ -2,46 +2,44 @@ CREATE DATABASE IF NOT EXISTS ZoomFront;
 USE ZoomFront;
 
 CREATE TABLE IF NOT EXISTS Users(
-	id int NOT NULL AUTO_INCREMENT ,
-    Administrator bit DEFAULT 0,
+	id serial ,
+	Username varchar(255) NOT NULL UNIQUE,
+	Pass varchar(255) NOT NULL,
     Balance decimal DEFAULT 0.0,
-    Username varchar(255) NOT NULL UNIQUE,
-    Pas varchar(255) NOT NULL,
-
+	Administrator bit DEFAULT 0,
     PRIMARY KEY (id)
 );
 /* Does not support rejecting friend requests. Who doesnt want more friends? */ 
 
 CREATE TABLE IF NOT EXISTS Friends(
-	UserID int,
-    FriendID int,
-    
-    PRIMARY KEY(UserID,FriendID),
-    KEY(FriendID, UserID),
+	id serial,
+	UserID BIGINT UNSIGNED,
+    FriendID BIGINT UNSIGNED,
+	PRIMARY KEY(id),
     FOREIGN KEY (UserID) REFERENCES Users(id),
     FOREIGN KEY (FriendID) REFERENCES Users(id)
 );
 
 CREATE TABLE IF NOT EXISTS Games(
-	id int,
-    Title varchar(255) NOT NULL,
+	id serial,
+    Title varchar(255) NOT NULL UNIQUE,
     Price decimal NOT NULL,
     PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS UserLibraries(
-	GameID int,
-    UserID int,
-    PRIMARY KEY(GameID,UserID),
-    KEY(UserID,GameID),
+	id serial,
+	GameID BIGINT UNSIGNED,
+    UserID BIGINT UNSIGNED,
+    PRIMARY KEY(id),
     FOREIGN KEY (GameID) REFERENCES Games(id),
     FOREIGN KEY (UserID) REFERENCES Users(id)
 );
 
 CREATE TABLE IF NOT EXISTS Reviews(
-	id int,
-    AuthorID int,
-    GameID int,
+	id serial,
+	GameID BIGINT UNSIGNED,
+    AuthorID BIGINT UNSIGNED,
     Body mediumtext,
     Rating int CHECK (Rating >= 1 AND Rating <= 5),
     PRIMARY KEY(id),
@@ -50,16 +48,26 @@ CREATE TABLE IF NOT EXISTS Reviews(
 );
 
 CREATE TABLE IF NOT EXISTS Tags(
-	id int,
-    TagName varchar(255) NOT NULL,
+	id serial,
+    TagName varchar(255) NOT NULL UNIQUE,
     PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS TagRelations(
-	TagID int,
-    GameID int,
-    PRIMARY KEY(TagID, GameID),
-    KEY(GameID, TagID),
+	id serial,
+	TagID BIGINT UNSIGNED,
+    GameID BIGINT UNSIGNED,
+    PRIMARY KEY(id),
     FOREIGN KEY (GameID) REFERENCES Games(id),
     FOREIGN KEY (TagID) REFERENCES Tags(id)
 );
+
+
+
+
+
+
+
+
+	
+	
