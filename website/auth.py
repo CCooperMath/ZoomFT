@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from . import loginManager
+from . import session
+from . import loginManager, userManager
 from .datatypes import User
 auth = Blueprint('auth',__name__)
 
@@ -42,5 +43,31 @@ def createAccount():
 
 @auth.route('/settings', methods=['GET','POST'])
 def settings():
-    
+    if request.method == 'POST':
+        # Get ID of viewing user when the page 
+        # was opened. Only execute this if 
+        # the current session ID matches that user ID. 
+        viewerID = int(request.form.get('userAtView'))
+        ids = (session['userID'],viewerID)
+        if(session['userID'] == viewerID):
+            match request.form.get('type'):
+                case 'passChange':
+                    newPass = request.form.get('newPass')
+                    success = userManager.changePassword(viewerID,newPass) 
+                    if(not success):
+                        print("Failed to change password.")
+                    
+                case 'nameChange':
+                    newName = request.form.get('newName')
+                    success = userManager.changeUsername(viewerID,newName)
+                    if(not success):
+                        print("Username already in use.")
+                case 'deleteAccount':
+                    success = userManager.deleteUser(viewerID)
+                    if(not success):
+                        print("Failed to delete user.")
+                    else:
+                        return redirect(url_for('auth.login'))
+        else:
+            print("viewerID to sessionID mismatch.") 
     return render_template("settings.html")

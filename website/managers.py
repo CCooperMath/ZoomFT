@@ -173,13 +173,13 @@ class UserManager:
         """
         self.interfacer = interfacer 
 
-    def changeUsername(self, startName, endName):
+    def changeUsername(self, userID, endName):
         """ Changes the username for a user.
 
         Parameters 
         ----------
-        startName: string
-            The original username for a user. 
+        userID: int
+            The id for the user whose name is being changed.
         endName: string
             The desired username for said user.
 
@@ -187,12 +187,14 @@ class UserManager:
         ----------
         True if the username was successfully changed. False if otherwise. 
         """
+        if not self.getUser(endName):
+            success = self.interfacer.editEntry('Users','id','Username',userID,endName)
+            self.interfacer.commit()
+            return success
+        else: 
+            return False
 
-        success = self.interfacer.editEntry('Users','Username','Username',startName,endName)
-        self.interfacer.commit()
-        return success
-
-    def changePassword(self, username, newPassword):
+    def changePassword(self, userID, newPassword):
         """ Changes the password for a user.
 
         Parameters 
@@ -206,7 +208,7 @@ class UserManager:
         ----------
         True if the password was successfully changed. False if otherwise. 
         """
-        success = self.interfacer.editEntry('Users','Username','Password',username,newPassword)
+        success = self.interfacer.editEntry('Users','id','Pass',userID, newPassword)
         self.interfacer.commit() 
         return success 
 
@@ -241,16 +243,16 @@ class UserManager:
         return self.interfacer.fetchall() 
     
 
-    def addFriend(self, user1, user2):
+    def addFriend(self, userID1, userID2):
         """ Adds a friendship between two users to the SQL database.
         Note that the friendship is added in both directions.
 
         Parameters 
         ----------
-        user1: string
-            The username of one of the users.
-        user2: string
-            The username of the other user.
+        userID1: string
+            The userID of the first friend in the pair.
+        userID2: string
+            The userID of the second friend in the pair.
 
         Returns
         ----------
@@ -258,10 +260,6 @@ class UserManager:
 
         """
         
-        userID1 = self.interfacer.getID('Users','Username',user1)
-        userID2 = self.interfacer.getID('Users','Username',user2)
-
-        # Add friendship both ways. 
         success = self.interfacer.addRelation('Friends','UserID', 'FriendID', userID1, userID2)
         success = success and self.interfacer.addRelation('Friends', 'FriendID', 'UserID', userID1, userID2)
         self.interfacer.commit()
@@ -286,6 +284,11 @@ class UserManager:
         friends = self.interfacer.getRelated('Friends','Users','UserID','FriendID',userID)
         return friends
 
+    def getFriendIDs(self, friendList):
+        for user in friendList:
+            print(user[2])
+        friendIDs= [ user[2] for user in friendList ]
+        return friendIDs
 
 
 
@@ -324,18 +327,37 @@ class UserManager:
             self.interfacer.commit()
         return success
 
-    def deleteFriendships(self, username):
+    def deleteFriend(self, userID, friendID):
+        """ Deletes a specific friendship between userID and friendID 
+        Parameters
+        ----------
+        userID: int
+            id of the first user in the friendship.
+        friendID: int
+            id of the second user in the friendship.
+
+        Returns 
+        ----------
+        True upon a successful deletion. False if otherwise. 
+        """
+        try:
+            success = self.interfacer.removeRelation('Friends', 'UserID', 'FriendID', userID, friendID)
+            success = success and self.interfacer.removeRelation('Friends','FriendID','UserID',userID,friendID)
+            return success
+        except Exception as e:
+            print(e)
+            return False 
+
+    def deleteFriendships(self, userID):
         """ Deletes all entries from the SQL database for a users friendships 
         """
-        userID = self.interfacer.getID('Users','Username',username)
-        # Remove entries twice because friendship is symmetric. 
         success = self.interfacer.removeRelated('Friends','UserID',userID)
         success = success and self.interfacer.removeRelated('Friends', 'FriendID', userID)
         self.interfacer.commit()
         return success
         
 
-    def deleteLibrary(self, username):
+    def deleteLibrary(self, userID):
         """ Deletes all entries from the library matching a user to a game.
 
         Parameters
@@ -348,12 +370,11 @@ class UserManager:
         True if the library was successfully deleted. False if otherwise.
         """
 
-        userID = self.interfacer.getID('Users','Username',username)
-        success = self.interfacer.removeReleated('UserLibraries', 'UserID', userID)
+        success = self.interfacer.removeRelated('UserLibraries', 'UserID', userID)
         self.interfacer.commit()
         return success
 
-    def deleteReviews(self, username):
+    def deleteReviews(self, userID):
         """
         Parameters 
         ----------
@@ -366,20 +387,19 @@ class UserManager:
 
         """
         
-        userID = self.interfacer.getID('Users','Username',username)
         success = self.interfacer.removeRelated('Reviews','AuthorID',userID)
         self.interfacer.commit()
         return success
 
 
-    def deleteUser(self, username):
+    def deleteUser(self, userID):
         """ Deletes a user from the Users table of the SQL database. 
         This also deletes their library and active friendships. 
 
         Parameters
         ----------
-        username: string
-            The username to delete from the database.
+        userID: int
+            The userID of the user to delete from the database.
 
         returns 
         ---------
@@ -387,24 +407,33 @@ class UserManager:
         """
         deletion_success = True 
         # Begin by deleting the user friendships.
-        deletion_success = (deletion_success and self.deleteFriendships(username))
+        deletion_success = (deletion_success and self.deleteFriendships(userID))
         
         # Delete the users reviews. 
-        deletion_success = (deletion_success and self.deleteReviews(username))
+        deletion_success = (deletion_success and self.deleteReviews(userID))
 
         # Delete the users library. 
-        deletion_success = (deletion_succes and self.deleteLibrary(username))
+        deletion_success = (deletion_success and self.deleteLibrary(userID))
 
         # If all previous attempts succeeded, delete the user account. 
         try:
-            self.interfacer.execute('DELETE FROM Users WHERE Username = %s', (username, ))
+            self.interfacer.execute('DELETE FROM Users WHERE id = %s', (userID, ))
             self.interfacer.commit()
+            self.logout()
             return True
         except Exception as e:
             print(e)
             return False 
 
 
+    def logout(self):
+        """ Logs out a user by modifying the session variables 
+        for username and administrator. 
+        """
+
+        session['username'] = None
+        session['administrator'] = False
+        session['userID'] = None
 
 
 class GameManager:

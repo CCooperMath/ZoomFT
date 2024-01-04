@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, session, request
 from . import interfacer, loginManager, userManager, tagManager, gameManager
 
 views = Blueprint('views',__name__)
@@ -12,11 +12,38 @@ def home():
     return render_template("home.html")
 
 
-@views.route('/users')
+@views.route('/users', methods=['GET', 'POST'])
 def user():
+    if request.method == "POST":
+        viewerID = int(request.form.get('viewerID'))
+        if(session['userID'] == viewerID):
+            friendID = int(request.form.get('friendID'))
+            match request.form.get('subType'):
+                case 'removeFriend':
+                    success = userManager.deleteFriend(viewerID,friendID)
+                    if(success):
+                        print("Friend removed.")
+                    else:
+                        print("Failed to remove friend.")
+                case 'addFriend':
+                    success = userManager.addFriend(viewerID,friendID)
+                    if(success):
+                        print("Friend added.")
+                    else:
+                        print("Failed to add friend.")
+
+        else:
+            print("Session and viewerID mismatch")
+
+
+
+
     userList = userManager.getAllUsers()
-    print(userList)
-    return render_template("users.html", users = userList)
+    if session['userID']:
+        userFriends = userManager.getFriendsOf(session['username'])
+        friendIDs = userManager.getFriendIDs(userFriends)
+        return render_template("users.html", users=userList, friendIDs = friendIDs)
+    return render_template("users.html", users=userList)
 
 @views.route('/games')
 def games():
@@ -31,8 +58,6 @@ def profile(userID):
     username = userInfo[1]
     userLibrary = userManager.getLibrary(username)
     userFriends = userManager.getFriendsOf(username)
-    print(userLibrary)
-    print(userFriends)
     return render_template("profile.html", userInfo = userInfo, library = userLibrary, 
                            friends = userFriends)
 

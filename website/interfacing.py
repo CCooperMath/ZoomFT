@@ -265,6 +265,7 @@ jinja variqables
         query = f'INSERT INTO {joinTable}({idName1},{idName2}) VALUES (%s,%s)'
         try: 
             self.execute(query, (id1, id2))
+            return True
         except Exception as e:
             print(e)
             return False
@@ -340,7 +341,7 @@ jinja variqables
 
         query = f'UPDATE {table} SET {editField} = %s WHERE {refField} = %s'
         try:
-            self.execute(query, (editval,refVal))
+            self.execute(query, (editVal,refVal))
             return True
         except Exception as e:
             print(e)

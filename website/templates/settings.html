@@ -1,13 +1,37 @@
 {% extends "base.html" %} 
 {% block pageContent %}
 
-<form>
+{% if session['userID'] %}
+
+<h2>Change Username</h2>
+<form method="post">
+    <input type="hidden" name="type" value="nameChange">
+    <input type="hidden" name="userAtView" value = {{session['userID']}}>
+    <label for="newName">Enter a username</label><br>
+    <input type="text" id="newName" name="newName" required><br>
+    <input type="submit" value="Submit new username">
 </form>
 
-<form>
+<h2>Change Password</h2>
+<form method="post">
+    <input type="hidden" name="type" value="passChange">
+    <input type="hidden" name="userAtView" value = {{session['userID']}}>
+    <label for="newPass">Enter a password</label><br>
+    <input type="text" id="newPass" name="newPass" required><br>
+    <input type="submit" value="Submit new password">
 </form>
 
-<form>
+<h2> Delete Account </h2>
+<form method="post">
+    <input type="hidden" name="type" value="deleteAccount">
+    <input type="hidden" name="userAtView" value= {{session['userID']}}>
+    <input type="submit" value="Delete my account">
 </form>
+
+
+{% else %}
+<p> <b> Hey! You arent supposed to be here if you aren't signed in silly! Try logging in or creating 
+    an account, </b> </p>
+{% endif %}
 {% endblock %}
 

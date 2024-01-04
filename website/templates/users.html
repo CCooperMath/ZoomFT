@@ -12,13 +12,32 @@
     <tr>
         <td><a href='/users/{{user[0]}}'> {{user[1]}} </a> </td>
         <td> {{user[4] == 1}} </td>
-        {% if user[3] in friendList %}
-        <td> <button>Remove Friend </button> </td>
+        {% if session['userID'] %}
+        {% if (user[0] in friendIDs)%}
+        <td>
+            <form method = 'post'> 
+                <input type="hidden" name="subType" value="removeFriend">
+                <input type="hidden" name="viewerID" value={{session['userID']}}>
+                <input type="hidden" name="friendID" value={{user[0]}}>
+                <input type="submit" value="Remove Friend">
+            </form>
+        </td>
         {% else %}
-        <td> <button>Add Friend </button> </td>
+        <td>
+            <form method = 'post'> 
+                <input type="hidden" name="subType" value="addFriend">
+                <input type="hidden" name="viewerID" value={{session['userID']}}>
+                <input type="hidden" name="friendID" value={{user[0]}}>
+                <input type="submit" value="Add Friend">
+            </form>
+        </td>
+        {% endif %}
         {% endif %}
         {% if session['administrator'] %}
-        <td> <button>Ban</button> </td>
+        <td> 
+            <form method='post'> 
+            </form> 
+        </td>
         {% endif %}
     </tr>
     {% endfor %}
