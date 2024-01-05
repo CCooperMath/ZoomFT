@@ -35,5 +35,5 @@ should really work with IDs more often, and if I go back and make refactors of t
 ## Known Bugs
 
 When fetching the list of games with a shared tag, duplicates appear because two games may share different tags! 
-should really work with IDs more often, and if I go back and make refactors of those classes I would 100% change that aspect of the code. 
+
 
