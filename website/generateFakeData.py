@@ -10,6 +10,7 @@ import random
 
 def generateData():
 
+    
     config = { 
         'host' : ,
         'port' : ,
@@ -17,7 +18,6 @@ def generateData():
         'password' : ,
         'database' : 'ZoomFront' 
     }
-
     interfacer = Interfacer(config)
     userManager = UserManager(interfacer)
     loginManager = LoginManager(interfacer)
@@ -25,7 +25,7 @@ def generateData():
     tagManager = TagManager(interfacer)
 
     # Generates fake users, and game titles / prices and populates the database
-    with open('/home/fishy/ZoomFrontRepo/ZoomFT/website/FakeInfo/FakeUsers.csv', newline='') as userCSV:
+    with open('./website/FakeInfo/FakeUsers.csv', newline='') as userCSV:
         usernames = set() 
         userReader = csv.reader(userCSV)
         for row in userReader:
@@ -44,7 +44,7 @@ def generateData():
 
 
     # Generates fake games. 
-    with open('/home/fishy/ZoomFrontRepo/ZoomFT/website/FakeInfo/FakeGames.csv', newline='')  as gameCSV:
+    with open('./website/FakeInfo/FakeGames.csv', newline='')  as gameCSV:
         gameReader = csv.reader(gameCSV)
         gameNames = set()
         for row in gameReader:
@@ -52,7 +52,7 @@ def generateData():
             gameNames.add(str(row[0]))
 
     # Generates a tag list.
-    with open('/home/fishy/ZoomFrontRepo/ZoomFT/website/FakeInfo/Tags.csv', newline='') as tagCSV:
+    with open('./website/FakeInfo/Tags.csv', newline='') as tagCSV:
         tagReader = csv.reader(tagCSV)
         tags = set()
         for row in tagReader:

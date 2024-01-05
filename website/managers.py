@@ -586,7 +586,6 @@ class GameManager:
             if gameTags != None:
                 # The game has tags. 
                 for tags in gameTags:
-                    print(tags)
                     # Fetch all games with this tag.
                     games = self.interfacer.getRelated('TagRelations', 'Games', 'TagID', 'GameID', tags[1])
                     # the games variable is 100% not None, because it at least has 

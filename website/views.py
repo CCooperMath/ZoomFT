@@ -68,7 +68,7 @@ def profile(userID):
                     print("Successfully added friend.")
                 else:
                     print("Failed to add friend.")
-                return redirect(url_for('users/{{userID}}'))
+                return redirect(url_for('users.{{userID}}'))
         
             case 'removeFriend':
                 friendID = userID
@@ -77,7 +77,7 @@ def profile(userID):
                     print("Sucessfully removed friend.")
                 else:
                     print("Failed to remove friend.")
-                return redirect(f'/users/{userID}')
+                return redirect(f'users.{userID}')
                 return redirect(url_for('users/{{userID}}'))
             case 'balanceChange':
                 # This function would obviously need input sanitation
@@ -89,7 +89,7 @@ def profile(userID):
                     print("Invalid amount passed for balance change")
                 else:
                     userManager.changeFunds(userID,balanceChange)
-                return redirect(url_for('users/{{userID}}'))
+                return redirect(url_for('users.{{userID}}'))
 
     if(session['userID']):
         # If the VIEWER is logged in we can get their friends.
