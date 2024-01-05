@@ -10,7 +10,6 @@ auth = Blueprint('auth',__name__)
 @auth.route('/login', methods=['GET','POST'])
 def login():
     if request.method == "POST":
-        loginData = request.form
         username = request.form.get('username')
         password = request.form.get('password')
 
@@ -31,7 +30,6 @@ def logout():
 def createAccount():
 
     if request.method == "POST":
-        accountData = request.form
         username = request.form.get('username')
         password = request.form.get('password')
 
@@ -48,7 +46,6 @@ def settings():
         # was opened. Only execute this if 
         # the current session ID matches that user ID. 
         viewerID = int(request.form.get('userAtView'))
-        ids = (session['userID'],viewerID)
         if(session['userID'] == viewerID):
             match request.form.get('type'):
                 case 'passChange':

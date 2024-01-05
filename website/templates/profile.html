@@ -3,12 +3,30 @@
 <body>
     <h1> {{userInfo[1]}} </h1>
     {% if session['userID'] == userInfo[0]%}
-    <form>
-        <label for="fundsAmount"> Add funds to your account </label><br>
-        <input type ="text" id="fundsAmount" name="fundsAmount"</br>
-
+    <form method='post'>
+        <label for="balanceChange"> Add funds to your account </label><br>
+        <input type ="text" id="balanceChange" name="balanceChange"</br>
         <input type ="submit" value="Add Funds">
     </form>
+
+    {% elif session['userID'] and session['userID'] != userInfo[0] %}
+    
+        {% if (userInfo[0] in friendIDs) %}
+            <form method = 'post'> 
+                <input type="hidden" name="subType" value="removeFriend">
+                <input type="hidden" name="viewerID" value={{session['userID']}}>
+                <input type="hidden" name="friendID" value={{userInfo[0]}}>
+                <input type="submit" value="Remove Friend">
+            </form>
+        {% else %}
+            <form method = 'post'> 
+                <input type="hidden" name="subType" value="addFriend">
+                <input type="hidden" name="viewerID" value={{session['userID']}}>
+                <input type="hidden" name="friendID" value={{userInfo[0]}}>
+                <input type="submit" value="Add Friend">
+            </form>
+        {%endif %}
+
 
     {% endif %}
 <hr>

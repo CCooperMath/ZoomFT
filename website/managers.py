@@ -137,6 +137,7 @@ class LoginManager:
             session['username'] = username
             session['administrator'] = user[0][const.SQL_ADMINISTRATOR]
             session['userID'] = user[0][const.SQL_ID]
+            session['accountBalance'] = user[0][const.SQL_BALANCE]
             return True
         else:
             return False 
@@ -149,6 +150,7 @@ class LoginManager:
         session['username'] = None
         session['administrator'] = False
         session['userID'] = None
+        session['accountbalance'] = None
 
 
 class UserManager:
@@ -263,9 +265,45 @@ class UserManager:
         success = self.interfacer.addRelation('Friends','UserID', 'FriendID', userID1, userID2)
         success = success and self.interfacer.addRelation('Friends', 'FriendID', 'UserID', userID1, userID2)
         self.interfacer.commit()
+        return success
+
+    def addFriendFromNames(self, username,friendName):
+        """
+        Parameters
+        ----------
+        username:str
+            The name of one of the users in the friendship.
+        friendName:str
+            The name of the other user in the friendship.
+
+        Returns
+        -------
+        True upon a successful addition. False if otherwise. 
+        """
+        userID = self.interfacer.getID('Users','Username', username)
+        friendID = self.interfacer.getID('Users','Username',friendName)
+        success = self.addFriend(userID,friendID)
         return success 
 
-    def getFriendsOf(self, username):
+    def addToLibraryFromNames(self, username,gameName):
+        """
+        Parameters
+        ----------
+        username:str
+            The name of a user whose library is being modified.
+        gameName:str
+            The name of the game in the library.
+
+        Returns
+        -------
+        True upon a successful addition. False if otherwise. 
+        """
+        userID = self.interfacer.getID('Users','Username',username)
+        gameID = self.interfacer.getID('Games','Title',gameName)
+        success = self.addToLibrary(userID,gameID)
+        return success
+
+    def getFriendsOf(self, userID):
         """ Fetches all friends of a specific user from the SQL database. 
         
         Parameters 
@@ -280,19 +318,16 @@ class UserManager:
         """
         # Returns a list of names that are friends with the user. 
        
-        userID = self.interfacer.getID('Users','Username',username)
         friends = self.interfacer.getRelated('Friends','Users','UserID','FriendID',userID)
         return friends
 
     def getFriendIDs(self, friendList):
-        for user in friendList:
-            print(user[2])
         friendIDs= [ user[2] for user in friendList ]
         return friendIDs
 
 
 
-    def getLibrary(self, username):
+    def getLibrary(self, userID):
         """ Fetches all games owned by a specific user from the SQL database. 
         
         Parameters 
@@ -305,11 +340,10 @@ class UserManager:
         An iterator over all tuples representing the games owned by a specific user.
 
         """
-        userID = self.interfacer.getID('Users','Username',username)
         gameLibrary = self.interfacer.getRelated('UserLibraries','Games','UserID','GameID',userID)
         return gameLibrary
 
-    def addToLibrary(self, username, title):
+    def addToLibrary(self, userID, gameID):
         """ Adds a game with a given title to a users library) 
         
         Parameters 
@@ -320,13 +354,13 @@ class UserManager:
         -------
         True if the game was successfully added to the library. False if otherwise. 
         """
-        userID = self.interfacer.getID('Users','Username',username)
-        gameID = self.interfacer.getID('Games','Title',title)
         if (userID != None and gameID != None):
             success = self.interfacer.addRelation('UserLibraries','UserID','GameID',userID,gameID)
             self.interfacer.commit()
-        return success
-
+            return success
+        else:
+            return False
+    
     def deleteFriend(self, userID, friendID):
         """ Deletes a specific friendship between userID and friendID 
         Parameters
@@ -424,6 +458,39 @@ class UserManager:
         except Exception as e:
             print(e)
             return False 
+
+    def changeFunds(self, userID, amt):
+        """ Adds funds to a user account. If the 
+        user's account balance would be negative, it does
+        not execute. 
+
+        Parameters
+        ----------
+        userID: int
+            The user's userID in the SQL database.
+        amt: float
+            The amount to change the account balance by. 
+            Can be positive or negative. 
+
+        Returns
+        -------
+        True if the change succeeded. False if the change failed either
+        due to failure of the SQL query OR due to the user now having
+        negative account balance 
+        """
+        try:
+            userBalance = self.interfacer.getFromReference('Users','id',userID)[3]
+            if(userBalance + amt < 0):
+                print("User would have negative balance.")
+                return False 
+            else:
+                newBalance = userBalance + amt
+                self.interfacer.editEntry('Users','id','Balance',userID,newBalance)
+                return True
+        except Exception as e:
+            print(e)
+            return False
+
 
 
     def logout(self):
@@ -525,8 +592,11 @@ class GameManager:
                     # the games variable is 100% not None, because it at least has 
                     # our input game in its list. 
                     for game in games:
-                        print(game)
                         gamesWithSharedTag.add(game)
+                # The funniest thing about this function is it returns duplicate 
+                # entries because two games may share different tags! This is a bug 
+                # that can be fixed with some sanitation. But I am avoiding it for now.
+                
                 return gamesWithSharedTag 
             else: 
                 return None
@@ -733,7 +803,7 @@ class TagManager:
         """
         try:
             self.interfacer.execute('SELECT 1 FROM Tags WHERE TagName = %s', (tagName, ))
-            return (self.interacer.fetchall() != None)
+            return (self.interfacer.fetchall() != None)
         except Exception as e:
             print(e)
             return False

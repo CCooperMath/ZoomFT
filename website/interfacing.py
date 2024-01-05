@@ -11,6 +11,7 @@ class Interfacer:
         The cursor used to query the SQL Database. 
         
     """
+
     def __init__(self,config):
         """ 
         Parameters 
@@ -130,7 +131,8 @@ class Interfacer:
         self.execute(query, (reference, ))
         if((result := self.fetchall()) != None):
             return result[0][0]
-        return None
+        else:
+            return None
 
     def getFromReference(self,table,field,reference):
         """ Grabs rows from the SQL database that match the value reference in 
@@ -145,7 +147,6 @@ class Interfacer:
         reference: any
             The value to reference with the field. 
 
-jinja variqables
         Returns 
         -------
         An iterator over all tuples representing the result of the query. Returns
@@ -348,7 +349,6 @@ jinja variqables
             return False
 
         
-
 
 
 

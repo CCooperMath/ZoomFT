@@ -20,7 +20,9 @@
         <li><a href="/games">View Games</a></li>
         <li><a href="/users">View Users</a></li>
     </ul>
-
+    {% if session['userID'] %}
+    <p> Account Balance : ${{session['accountBalance']}} </p>
+    {% endif %}
     <hr>
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if message %}

@@ -3,14 +3,13 @@
 from flask import Flask, session
 from .interfacing import Interfacer
 from .managers import LoginManager, UserManager, GameManager, TagManager
-
-
+from .generateFakeData import generateData
 
 config = { 
-        'host' : '127.0.0.1',
-        'port' : 3306,
-        'user' : 'root',
-        'password' : 'Yuh',
+        'host' : ,
+        'port' : ,
+        'user' : ,
+        'password' : ,
         'database' : 'ZoomFront' 
 }
 
@@ -23,7 +22,10 @@ gameManager = GameManager(interfacer)
 
 # Database initialization 
 
+
+
 def initialize():
+    generateData()
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'W3lcomeToZO0MFR0NT'
 

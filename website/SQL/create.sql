@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS Friends(
     FriendID BIGINT UNSIGNED,
 	PRIMARY KEY(id),
     FOREIGN KEY (UserID) REFERENCES Users(id),
-    FOREIGN KEY (FriendID) REFERENCES Users(id)
+    FOREIGN KEY (FriendID) REFERENCES Users(id),
+    UNIQUE(UserID,FriendID)
 );
 
 CREATE TABLE IF NOT EXISTS Games(
@@ -33,7 +34,8 @@ CREATE TABLE IF NOT EXISTS UserLibraries(
     UserID BIGINT UNSIGNED,
     PRIMARY KEY(id),
     FOREIGN KEY (GameID) REFERENCES Games(id),
-    FOREIGN KEY (UserID) REFERENCES Users(id)
+    FOREIGN KEY (UserID) REFERENCES Users(id),
+    UNIQUE(GameID,UserID)
 );
 
 CREATE TABLE IF NOT EXISTS Reviews(
@@ -44,7 +46,8 @@ CREATE TABLE IF NOT EXISTS Reviews(
     Rating int CHECK (Rating >= 1 AND Rating <= 5),
     PRIMARY KEY(id),
     FOREIGN KEY(AuthorID) REFERENCES Users(id),
-    FOREIGN KEY(GameID) REFERENCES Games(id)
+    FOREIGN KEY(GameID) REFERENCES Games(id),
+    UNIQUE(GameID,AuthorID,Body)
 );
 
 CREATE TABLE IF NOT EXISTS Tags(
