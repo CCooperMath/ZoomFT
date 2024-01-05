@@ -6,10 +6,6 @@ from .managers import LoginManager, UserManager, GameManager, TagManager
 from .generateFakeData import generateData
 
 config = { 
-        'host' : ,
-        'port' : ,
-        'user' : ,
-        'password' : ,
         'database' : 'ZoomFront' 
 }
 

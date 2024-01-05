@@ -12,11 +12,6 @@ def generateData():
 
     
     config = { 
-        'host' : ,
-        'port' : ,
-        'user' : ,
-        'password' : ,
-        'database' : 'ZoomFront' 
     }
     interfacer = Interfacer(config)
     userManager = UserManager(interfacer)
