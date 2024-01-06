@@ -9,11 +9,8 @@ description = "Fake steam-style storefront that interfaces with an SQL database"
 readme = "readme.md"
 
 dependencies = [
-    "flask",
-    "mysql.connector",
-    "collections.abc",
-    "csv",
-    "random"
+    "Flask",
+    "mysql-connector-python"
 ]
 
 requires-python = ">=3.8"
