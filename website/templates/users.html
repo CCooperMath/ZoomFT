@@ -1,0 +1,46 @@
+
+    {% extends "base.html" %}
+    {% block pageContent%}
+    <body>
+    <table>
+        <tr>
+            <td> User </td>
+            <td> Admin? </td>
+            <td> Friend? </td>
+        </tr>
+    {% for user in users %}
+    <tr>
+        <td><a href='/users/{{user[0]}}'> {{user[1]}} </a> </td>
+        <td> {{user[4] == 1}} </td>
+        {% if session['userID'] %}
+        {% if (user[0] in friendIDs)%}
+        <td>
+            <form method = 'post'> 
+                <input type="hidden" name="subType" value="removeFriend">
+                <input type="hidden" name="viewerID" value={{session['userID']}}>
+                <input type="hidden" name="friendID" value={{user[0]}}>
+                <input type="submit" value="Remove Friend">
+            </form>
+        </td>
+        {% else %}
+        <td>
+            <form method = 'post'> 
+                <input type="hidden" name="subType" value="addFriend">
+                <input type="hidden" name="viewerID" value={{session['userID']}}>
+                <input type="hidden" name="friendID" value={{user[0]}}>
+                <input type="submit" value="Add Friend">
+            </form>
+        </td>
+        {% endif %}
+        {% endif %}
+        {% if session['administrator'] %}
+        <td> 
+            <form method='post'> 
+            </form> 
+        </td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+    <table>
+    </body>
+    {% endblock %}

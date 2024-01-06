@@ -1,0 +1,27 @@
+    {% extends "base.html" %}
+    {% block pageContent%}
+    <body>
+    <h1>Welcome to ZoomFront!</h1>
+    {% if session['username'] %}
+    <div class="container">
+        <p> Oh. This is embarassing. You're not supposed to be here when youre logged in, yknow? </p>
+        <span class="goHome"><a href="/">Head on back home.</a></span>
+    </div>
+    {% else %}
+    <form method="POST">
+    <div class="container">
+        <label for="Username"><b>Username</b></label>
+        <input type="text" placeholder="Enter username" id="username" name="username" required>
+    </div>
+    <div class="container">
+        <label for="Password"><b>Password</b></label>
+        <input type="text" placeholder="Enter password" id="password" name="password" required>
+        <button type ="submit">Login</button>
+    </div>
+    </form>
+    <div class="container">
+        <span class="createAccount"><a href="/auth/createAccount">Create an account?</a></span>
+    </div>
+    </body>
+    {% endif %}
+    {% endblock %}

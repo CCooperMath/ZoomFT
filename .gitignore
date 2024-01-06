@@ -1,0 +1,6 @@
+
+*.pyc
+*.pyc
+website/__pycache__/interfacing.cpython-311.pyc
+website/__pycache__/managers.cpython-311.pyc
+website/__pycache__/views.cpython-311.pyc

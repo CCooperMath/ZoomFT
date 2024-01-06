@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+        <title>ZoomFront</title>
+    </head>
+    <h1> ZoomFront </h1>
+    <ul>
+        {% if session['username'] %}
+        <li><a href="/auth/logout">Log out</a></li>
+        <li><a href="/users/{{session['userID']}}">My Profile</a></li>
+        
+        <li><a href="/auth/settings">Account Settings</a></li>
+        {% else %}
+        <li><a href="/auth/login">Log in</a></li>
+        <li><a href="/auth/createAccount">Create an account</a></li>
+        {% endif %}
+        <li><a href="/games">View Games</a></li>
+        <li><a href="/users">View Users</a></li>
+    </ul>
+    {% if session['userID'] %}
+    <p> Account Balance : ${{session['accountBalance']}} </p>
+    {% endif %}
+    <hr>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if message %}
+        {% for message in messages %}
+        <div role="success"> {{ message }} </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <div class="container">
+        {% block pageContent %}
+        {% endblock %}
+    </div>
+
+</html>
