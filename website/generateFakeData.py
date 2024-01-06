@@ -27,12 +27,12 @@ def generateData():
             loginManager.createAccount(str(row[0]),str(row[1]), float(row[2]), int(row[3]))
             usernames.add(str(row[0]))
 
-    # Generates fake friendships between users. Adds up to 5 friendships to each assuming
+    # Generates fake friendships between users. Adds up to 2 friendships to each assuming
     # no user tries to add themselves as a friend and isnt duplicated. 
 
     userList = list(usernames)
     for user in usernames:
-        for i in range(0,5):
+        for i in range(0,2):
             newFriend = random.choice(userList)
             if newFriend != user:
                 userManager.addFriendFromNames(user,newFriend)
@@ -54,17 +54,17 @@ def generateData():
             tagManager.createTag(str(row[0]))
             tags.add(str(row[0]))
 
-    # Randomly adds tags to games. Adds 10 tags to each game. 
+    # Randomly adds tags to games. Adds 3 tags to each game. 
     gameList = list(gameNames)
     tagList = list(tags)
     for games in gameNames:
-        for i in range(0,10):
+        for i in range(0,3):
             newTag = random.choice(tagList)
             gameManager.addTag(games,newTag)
 
-    # Randomly add games to user libraries. Adds up to 8 games to each user. 
+    # Randomly add games to user libraries. Adds up to 2 games to each user. 
     for user in userList:
-        for i in range(0,8):
+        for i in range(0,2):
             newGame = random.choice(gameList)
             userManager.addToLibraryFromNames(user,newGame)
 

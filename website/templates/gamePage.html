@@ -3,8 +3,15 @@
 <body>
 <h1>{{game[1]}}</h1>
 
-{% if session['username'] %}
-<button>Purchase game for ${{game[2]}}</button>
+{% if session['userID'] %}
+    {% if game[0] not in libraryIDs %}
+    <form method='post'>
+        <input type="hidden" name="subType" value="purchaseRequest">
+        <input type ="submit", value="Purchase this game for ${{game[2]}}">
+    </form>
+    {% else %}
+    <i> You own this game </i>
+    {% endif %}
 {% endif %}
 
 <h1> Interested in similar games? </h1>

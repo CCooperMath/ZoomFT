@@ -32,6 +32,8 @@ ZoomFront is flawed in many ways! In particular, it stores passwords in plain te
 At a certain point in coding up the manager classes, I realized that it was much more appropriate to work with IDs than things like a fixed username at time of clicking a link. Philosophically, every part of the manager classes
 should really work with IDs more often, and if I go back and make refactors of that class I would 100% change that aspect of the code.
 
+The code for the webpages includes a lot of useless logic. If I had managed my project a little more from the outset and decided where inputs are santizied, how errors are thrown in a standard way, and how to do the logical flow from the beginning I would've saved myself a lot of headache later. 
+
 ## Known Bugs
 
 When fetching the list of games with a shared tag, duplicates appear because two games may share different tags! 

@@ -479,7 +479,7 @@ class UserManager:
         negative account balance 
         """
         try:
-            userBalance = self.interfacer.getFromReference('Users','id',userID)[3]
+            userBalance = float(self.interfacer.getFromID('Users',userID)[3])
             if(userBalance + amt < 0):
                 print("User would have negative balance.")
                 return False 

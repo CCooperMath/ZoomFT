@@ -184,9 +184,11 @@ class Interfacer:
         query = f'SELECT * FROM {table} WHERE id = %s'
 
         self.execute(query, (entryID, ))
-        if((result := self.fetchall()) != None):
+        result = self.fetchall()
+        if(result):
             return result[0]
-        return None
+        else:
+            return None
 
     def deleteFromReference(self,table, field, reference):
         """ Deletes all values from a table which have value 'reference' 
@@ -343,6 +345,7 @@ class Interfacer:
         query = f'UPDATE {table} SET {editField} = %s WHERE {refField} = %s'
         try:
             self.execute(query, (editVal,refVal))
+            self.commit()
             return True
         except Exception as e:
             print(e)

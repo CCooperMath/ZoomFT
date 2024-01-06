@@ -5,10 +5,10 @@ from .interfacing import Interfacer
 from .managers import LoginManager, UserManager, GameManager, TagManager
 from .generateFakeData import generateData
 
+
 config = { 
         'database' : 'ZoomFront' 
 }
-
 # Create the Flask application and set its secret key.
 interfacer = Interfacer(config)
 loginManager = LoginManager(interfacer)
@@ -16,12 +16,12 @@ tagManager = TagManager(interfacer)
 userManager = UserManager(interfacer)
 gameManager = GameManager(interfacer)
 
-# Database initialization 
-
-
 
 def initialize():
+    # Creates the database 
     generateData()
+
+
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'W3lcomeToZO0MFR0NT'
 

@@ -3,7 +3,7 @@
 
 from flask import Blueprint, render_template, session, request, redirect, url_for
 from . import interfacer, loginManager, userManager, tagManager, gameManager
-
+from . import constants as const
 views = Blueprint('views',__name__)
 
 
@@ -48,7 +48,13 @@ def user():
 @views.route('/games')
 def games():
     gameList = gameManager.getAllGames()
-    return render_template("games.html", games = gameList)
+    if(session['userID']):
+        # A user is signed in. We can check their library. 
+        userLibrary = userManager.getLibrary(session['userID'])
+        libraryIDs = {game[1] for game in userLibrary}
+        return render_template("games.html", games = gameList, libraryIDs = libraryIDs)
+    else:   
+        return render_template("games.html", games = gameList)
 
 @views.route('/users/<int:userID>', methods=['GET','POST'])
 def profile(userID):
@@ -68,8 +74,8 @@ def profile(userID):
                     print("Successfully added friend.")
                 else:
                     print("Failed to add friend.")
-                return redirect(url_for('users.{{userID}}'))
         
+                return redirect(f'/users/{userID}')
             case 'removeFriend':
                 friendID = userID
                 viewerID = session['userID']
@@ -77,8 +83,7 @@ def profile(userID):
                     print("Sucessfully removed friend.")
                 else:
                     print("Failed to remove friend.")
-                return redirect(f'users.{userID}')
-                return redirect(url_for('users/{{userID}}'))
+                return redirect(f'/users/{userID}')
             case 'balanceChange':
                 # This function would obviously need input sanitation
                 # in a real production environment. But thats not the goal
@@ -89,7 +94,9 @@ def profile(userID):
                     print("Invalid amount passed for balance change")
                 else:
                     userManager.changeFunds(userID,balanceChange)
-                return redirect(url_for('users.{{userID}}'))
+                    session['accountBalance'] = interfacer.getFromID('Users',userID)[const.SQL_BALANCE]
+
+                return redirect(f'/users/{userID}')
 
     if(session['userID']):
         # If the VIEWER is logged in we can get their friends.
@@ -101,11 +108,35 @@ def profile(userID):
     return render_template("profile.html", userInfo = userInfo, library = userLibrary, 
                            friends = userFriends)
 
-@views.route('/games/<int:gameID>')
+@views.route('/games/<int:gameID>', methods=['GET','POST'])
 def gamePage(gameID):
     gameInfo = interfacer.getFromID('Games',gameID)
-    sharedTag = gameManager.getGamesWithSharedTag(gameInfo[1])
+    if(gameInfo != None):
+        sharedTag = gameManager.getGamesWithSharedTag(gameInfo[1])
+        if(request.method == 'POST'):
+            match(request.form.get('subType')):
+                case 'purchaseRequest':
+                    print("Purchasing")
+                    user = interfacer.getFromID('Users',session['userID'])
+                    if user != None and gameInfo != None :
+                        userBalance = float(user[const.SQL_BALANCE])
+                        gamePrice  = float(gameInfo[const.SQL_PRICE])
+                        if(userBalance >= gamePrice):
+                            gamePrice = -gamePrice
+                            userManager.changeFunds(session['userID'],gamePrice)
+                            userManager.addToLibrary(session['userID'],gameID)
+                    return redirect(f'/games/{gameID}')
 
-    return render_template("gamePage.html", game = gameInfo, relatedGames = sharedTag)
+        currentUser = interfacer.getFromID('Users',session['userID'])
+        if(currentUser):
+            userLibrary = userManager.getLibrary(currentUser[const.SQL_ID])
+            libraryIDs = {game[1] for game in userLibrary}
+            session['accountBalance'] = currentUser[const.SQL_BALANCE]
+            return render_template("gamePage.html", game = gameInfo, relatedGames = sharedTag,
+                                   userInfo = currentUser, libraryIDs = libraryIDs)
+        else:
+            return render_template("gamePage.html", game = gameInfo, relatedGames = sharedTag)
+    else:
+        return redirect('/games')
 
 
